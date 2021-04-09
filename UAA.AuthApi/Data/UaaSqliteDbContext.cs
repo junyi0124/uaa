@@ -18,7 +18,7 @@ namespace UAA.AuthApi.Data
     protected override void OnConfiguring(DbContextOptionsBuilder options)
     {
       // connect to sql server database
-      options.UseMySql(Configuration.GetConnectionString("uaa_sqlite_conn"));
+      //options.UseSqlite(Configuration.GetConnectionString("uaa_sqlite_conn"));
     }
   }
 }
