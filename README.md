@@ -1,13 +1,17 @@
-"# uaa" 
+"# uaa"
 
+## dotnet-ef update
+```cmd
+dotnet tool update -g dotnet-ef
+```
 
 ## mysql migration
-```
+```cmd
 dotnet ef database drop  -c UaaMysqlDbContext
 
 dotnet ef migrations add InitialCreate -c UaaMysqlDbContext -o Data\MysqlMigrations
 
-dotnet ef database update --context UaaMysqlDbContext
+dotnet ef database update -c UaaMysqlDbContext
 ```
 
 

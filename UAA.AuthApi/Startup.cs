@@ -12,6 +12,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using UAA.AuthApi.Data;
 using UAA.AuthApi.Services;
+using UAA.Model;
 
 namespace UAA.AuthApi
 {
@@ -35,14 +36,19 @@ namespace UAA.AuthApi
       //  services.AddDbContext<UaaDbContext, UaaSqliteDbContext>();
       services.AddDbContext<UaaDbContext, UaaMysqlDbContext>();
 
-      services.AddControllers();
+      services.AddCors();
+      services.AddControllers().AddJsonOptions(x => x.JsonSerializerOptions.IgnoreNullValues = true);
       services.AddSwaggerGen(c =>
       {
         c.SwaggerDoc("v1", new OpenApiInfo { Title = "UAA.AuthApi", Version = "v1" });
       });
 
+      // configure strongly typed settings object
+      services.Configure<AppSettings>(_configuration.GetSection("AppSettings"));
+
       services.AddScoped<IUserService, UserService>();
-      services.AddAutoMapper(this.GetType().Assembly);
+      //services.AddAutoMapper(this.GetType().Assembly);
+      services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -57,7 +63,17 @@ namespace UAA.AuthApi
 
       app.UseRouting();
 
+      // global cors policy
+      app.UseCors(x => x
+          .SetIsOriginAllowed(origin => true)
+          .AllowAnyMethod()
+          .AllowAnyHeader()
+          .AllowCredentials());
+
       app.UseAuthorization();
+
+      // custom jwt auth middleware
+      app.UseMiddleware<JwtMiddleware>();
 
       app.UseEndpoints(endpoints =>
       {

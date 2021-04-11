@@ -13,12 +13,28 @@ namespace UAA.Model.User
   public class AuthenticateModel
   {
     [Required]
-    public string Username { get; set; }
+    public string UserName { get; set; }
 
     [Required]
     public string Password { get; set; }
   }
 
+  /// <summary>
+  /// user model
+  /// </summary>
+  public class UserModel
+  {
+    public long Id { get; set; }
+    public string UserName { get; set; }
+    public string Email { get; set; }
+    public string DisplayName { get; set; }
+
+    public int Status { get; set; }
+  }
+
+  /// <summary>
+  /// user register model
+  /// </summary>
   public class RegisterModel
   {
     [Required]
@@ -29,14 +45,24 @@ namespace UAA.Model.User
     public string DisplayName { get; set; }
 
     [Required]
-    public string Username { get; set; }
+    public string UserName { get; set; }
 
     [Required]
     public string Password { get; set; }
+
+    [Required]
+    [Compare("Password", ErrorMessage = "两次输入密码不同，请重试")]
+    public string ConfirmPassword { get; set; }
   }
 
+  /// <summary>
+  /// user update model
+  /// </summary>
   public class UpdateModel
   {
+    [Required]
+    public string UserName { get; set; }
+
     [Required]
     [EmailAddress]
     public string Email { get; set; }
@@ -45,8 +71,14 @@ namespace UAA.Model.User
     public string DisplayName { get; set; }
   }
 
+  /// <summary>
+  /// user change password model
+  /// </summary>
   public class ChangePasswordModel
   {
+    [Required]
+    public string UserName { get; set; }
+
     [Required]
     public string OldPassword { get; set; }
 
@@ -58,13 +90,5 @@ namespace UAA.Model.User
     public string ConfirmPassword { get; set; }
   }
 
-  public class UserModel
-  {
-    public long Id { get; set; }
-    public string Email { get; set; }
-    public string DisplayName { get; set; }
-    public string Username { get; set; }
 
-    public int Status { get; set; }
-  }
 }
