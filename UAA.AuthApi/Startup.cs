@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using UAA.AuthApi.Data;
+using UAA.AuthApi.Services;
 
 namespace UAA.AuthApi
 {
@@ -39,6 +40,9 @@ namespace UAA.AuthApi
       {
         c.SwaggerDoc("v1", new OpenApiInfo { Title = "UAA.AuthApi", Version = "v1" });
       });
+
+      services.AddScoped<IUserService, UserService>();
+      services.AddAutoMapper(this.GetType().Assembly);
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

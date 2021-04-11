@@ -3,9 +3,9 @@
 
 ## mysql migration
 ```
-dotnet ef database drop
+dotnet ef database drop  -c UaaMysqlDbContext
 
-dotnet ef migrations add InitialCreate --context UaaMysqlDbContext -o Data\MysqlMigrations
+dotnet ef migrations add InitialCreate -c UaaMysqlDbContext -o Data\MysqlMigrations
 
 dotnet ef database update --context UaaMysqlDbContext
 ```

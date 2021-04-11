@@ -39,7 +39,7 @@ namespace UAA.AuthApi.Services
     }
 
 
-    public Task<UserAccount> GetById(Guid id, bool trakcing = false)
+    public Task<UserAccount> GetById(long id, bool trakcing = false)
     {
       var where = trakcing ? _context.Users.AsTracking() : _context.Users.AsNoTracking();
       return where.FirstOrDefaultAsync(c => c.Id == id);
@@ -96,7 +96,7 @@ namespace UAA.AuthApi.Services
     }
 
 
-    public async Task<int> Delete(Guid id)
+    public async Task<int> Delete(long id)
     {
       var user = await GetById(id, true);
       if (user == null) return 0;

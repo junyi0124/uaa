@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace UAA.AuthApi.Data.MysqlMigrations
@@ -11,7 +12,8 @@ namespace UAA.AuthApi.Data.MysqlMigrations
                 name: "t_auth_users",
                 columns: table => new
                 {
-                    id = table.Column<byte[]>(type: "binary(16)", nullable: false, defaultValueSql: "(uuid_to_bin(uuid()))"),
+                    id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     username = table.Column<string>(type: "varchar(40)", maxLength: 40, nullable: false),
                     display = table.Column<string>(type: "varchar(40)", maxLength: 40, nullable: false),
                     email = table.Column<string>(type: "varchar(40)", maxLength: 40, nullable: false),

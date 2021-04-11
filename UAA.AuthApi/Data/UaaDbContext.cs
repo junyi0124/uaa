@@ -35,10 +35,7 @@ namespace UAA.AuthApi.Data
 
         e.HasKey(x => x.Id);
         e.Property(x => x.Id)
-          .HasColumnName("id")
-          .HasColumnType("binary(16)")
-          .ValueGeneratedOnAdd()
-          .HasDefaultValueSql("(uuid_to_bin(uuid()))");
+          .HasColumnName("id");
 
         e.Property(x => x.UserName)
           .HasColumnName("username");

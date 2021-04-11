@@ -27,6 +27,8 @@ namespace UAA.AuthApi.Data
           x.CharSet(CharSet.Utf8Mb4);
           x.CharSetBehavior(CharSetBehavior.NeverAppend);
         })
+        .LogTo(Console.WriteLine)
+        .EnableSensitiveDataLogging()
         .EnableServiceProviderCaching();
     }
   }

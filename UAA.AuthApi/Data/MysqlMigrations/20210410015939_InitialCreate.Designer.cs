@@ -9,7 +9,7 @@ using UAA.AuthApi.Data;
 namespace UAA.AuthApi.Data.MysqlMigrations
 {
     [DbContext(typeof(UaaMysqlDbContext))]
-    [Migration("20210409141538_InitialCreate")]
+    [Migration("20210410015939_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -21,11 +21,10 @@ namespace UAA.AuthApi.Data.MysqlMigrations
 
             modelBuilder.Entity("UAA.Entity.UserAccount", b =>
                 {
-                    b.Property<byte[]>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("binary(16)")
-                        .HasColumnName("id")
-                        .HasDefaultValueSql("(uuid_to_bin(uuid()))");
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
 
                     b.Property<DateTime>("Created")
                         .ValueGeneratedOnAdd()

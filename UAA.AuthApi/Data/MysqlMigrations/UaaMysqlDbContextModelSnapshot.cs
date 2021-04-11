@@ -19,11 +19,10 @@ namespace UAA.AuthApi.Data.MysqlMigrations
 
             modelBuilder.Entity("UAA.Entity.UserAccount", b =>
                 {
-                    b.Property<byte[]>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("binary(16)")
-                        .HasColumnName("id")
-                        .HasDefaultValueSql("(uuid_to_bin(uuid()))");
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
 
                     b.Property<DateTime>("Created")
                         .ValueGeneratedOnAdd()
