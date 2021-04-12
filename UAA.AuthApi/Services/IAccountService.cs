@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using UAA.AuthApi.Data;
+using UAA.ExtensionsHttp;
 using UAA.Model;
 using UAA.Model.Auth;
 
@@ -34,12 +38,12 @@ namespace UAA.AuthApi.Services
     }
 
 
-    public AuthenticateResponse Authenticate(AuthenticateRequest model, string ipAddress)
+    public async Task<AuthenticateResponse> Authenticate(AuthenticateRequest model, string ipAddress)
     {
       var account = _context.Users.SingleOrDefault(x => x.UserName == model.UserName);
 
-      if (account == null || !account.IsVerified || !BC.Verify(model.Password, account.PasswordHash))
-        throw new AppException("Email or password is incorrect");
+      if (account == null || account.Status.CheckStatus(1) || !BC.Verify(model.Password, account.PasswordHash))
+        return (null, "");
 
       // authentication successful so generate jwt and refresh tokens
       var jwtToken = generateJwtToken(account);
@@ -82,6 +86,20 @@ namespace UAA.AuthApi.Services
       response.JwtToken = jwtToken;
       response.RefreshToken = newRefreshToken.Token;
       return response;
+    }
+
+    private string generateJwtToken(Account account)
+    {
+      var tokenHandler = new JwtSecurityTokenHandler();
+      var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
+      var tokenDescriptor = new SecurityTokenDescriptor
+      {
+        Subject = new ClaimsIdentity(new[] { new Claim("id", account.Id.ToString()) }),
+        Expires = DateTime.UtcNow.AddMinutes(15),
+        SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+      };
+      var token = tokenHandler.CreateToken(tokenDescriptor);
+      return tokenHandler.WriteToken(token);
     }
   }
 }

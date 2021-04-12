@@ -3,10 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using AutoMapper;
+
 using UAA.AuthApi.Services;
+using UAA.Entity;
 using UAA.Model;
+using UAA.Model.User;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace UAA.AuthApi.Controllers
 {
@@ -29,8 +33,8 @@ namespace UAA.AuthApi.Controllers
     //  return Ok(response);
     //}
 
-    [HttpPost("authenticate")]
-    public ActionResult<AuthenticateResponse> Authenticate(AuthenticateRequest model)
+    [HttpPost("login")]
+    public async Task<IActionResult> Login(AuthenticateRequest model)
     {
       var response = _accountService.Authenticate(model, ipAddress());
       setTokenCookie(response.RefreshToken);
@@ -38,7 +42,7 @@ namespace UAA.AuthApi.Controllers
     }
 
     [HttpPost("refresh-token")]
-    public ActionResult<AuthenticateResponse> RefreshToken()
+    public async Task<ActionResult> RefreshToken()
     {
       var refreshToken = Request.Cookies["refreshToken"];
       var response = _accountService.RefreshToken(refreshToken, ipAddress());
@@ -63,5 +67,7 @@ namespace UAA.AuthApi.Controllers
         else
             return HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
     }
+
+
   }
 }

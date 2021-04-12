@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace UAA.Model.Auth
+namespace UAA.Model
 {
   public class AuthenticateRequest
   {

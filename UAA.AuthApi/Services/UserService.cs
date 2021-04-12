@@ -79,6 +79,8 @@ namespace UAA.AuthApi.Services
       if(nullIfNameExist==null)
       {
         UserAccount newAccount = _mapper.Map<UserAccount>(user);
+        // create password hash and salt
+
         _context.Users.Add(newAccount);
         await _context.SaveChangesAsync();
         return newAccount;
@@ -127,46 +129,7 @@ namespace UAA.AuthApi.Services
       return await _context.SaveChangesAsync();
     }
 
-    private static void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
-    {
-      if (string.IsNullOrEmpty(password)) throw new AppException("password empty");
-      //if (string.IsNullOrWhiteSpace(password)) throw new ArgumentException("Value cannot be empty or whitespace only string.", "password");
 
-      using (var hmac = new System.Security.Cryptography.HMACSHA512())
-      {
-        passwordSalt = hmac.Key;
-        passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
-      }
-    }
-
-    private static byte[] RenewPasswordHash(string password, byte[] key)
-    {
-      if (string.IsNullOrEmpty(password)) throw new AppException("password empty");
-
-      using (var hmac = new System.Security.Cryptography.HMACSHA512(key))
-      {
-        return hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
-      }
-    }
-
-    private static bool VerifyPasswordHash(string password, byte[] storedHash, byte[] storedSalt)
-    {
-      if (string.IsNullOrEmpty(password)) throw new AppException("password empty");
-      //if (string.IsNullOrWhiteSpace(password)) throw new ArgumentException("Value cannot be empty or whitespace only string.", "password");
-      if (storedHash.Length != 64) throw new ArgumentException("Invalid length of password hash (64 bytes expected).", "passwordHash");
-      if (storedSalt.Length != 128) throw new ArgumentException("Invalid length of password salt (128 bytes expected).", "passwordHash");
-
-      using (var hmac = new System.Security.Cryptography.HMACSHA512(storedSalt))
-      {
-        var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
-        for (int i = 0; i < computedHash.Length; i++)
-        {
-          if (computedHash[i] != storedHash[i]) return false;
-        }
-      }
-
-      return true;
-    }
 
 
   }

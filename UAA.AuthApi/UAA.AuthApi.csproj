@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\UAA.Entity\UAA.Entity.csproj" />
+    <ProjectReference Include="..\UAA.ExtensionsHttp\UAA.ExtensionsHttp.csproj" />
     <ProjectReference Include="..\UAA.Model\UAA.Model.csproj" />
   </ItemGroup>
 
