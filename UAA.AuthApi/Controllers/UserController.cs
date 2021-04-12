@@ -20,7 +20,8 @@ namespace UAA.AuthApi.Controllers
     private readonly IUserService _userSrv;
     private readonly IMapper _mapper;
 
-    public UserController(IUserService userSrv,
+    public UserController(
+      IUserService userSrv,
       IMapper mapper)
     {
       _userSrv = userSrv;
@@ -30,23 +31,35 @@ namespace UAA.AuthApi.Controllers
     [HttpGet("{name:regex(^[[A-Za-z0-9-_.]]+$)}")]
     public async Task<IActionResult> GetUserByName([FromRoute] string name)
     {
-      var user = await _userSrv.GetByName(name, false);
+      try
+      {
+        var user = await _userSrv.GetByName(name, false);
 
-      var um = _mapper.Map<UserModel>(user);
-      if (user == null) return Ok(
-        new AppResponse<UserModel>
-        {
-          Code = 404,
-          Message = "user not found"
-        });
+        var um = _mapper.Map<UserModel>(user);
+        if (user == null) return Ok(
+          new AppResponse<UserModel>
+          {
+            Code = 404,
+            Message = "user not found"
+          });
 
-      return Ok(
-        new AppResponse<UserModel>
-        {
-          Code = 200,
-          Message = "",
-          Payload = um
-        });
+        return Ok(
+          new AppResponse<UserModel>
+          {
+            Code = 200,
+            Message = "",
+            Payload = um
+          });
+      }
+      catch (Exception e)
+      {
+        return Ok(
+          new AppResponse<UserModel>
+          {
+            Code = 500,
+            Message = e.Message
+          });
+      }
     }
 
     [HttpGet]
@@ -57,7 +70,7 @@ namespace UAA.AuthApi.Controllers
       return Ok(new AppResponse<List<UserModel>> { Code = 200, Payload = _mapper.Map<List< UserModel >>( list) });
     }
 
-    [HttpPost()]
+    [HttpPost]
     public async Task<IActionResult> Register([FromBody] RegisterModel model)
     {
       var errMsg = CheckRegisterModel(model);
