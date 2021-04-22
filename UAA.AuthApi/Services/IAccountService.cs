@@ -5,20 +5,23 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
-using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using AutoMapper;
+
 using UAA.AuthApi.Data;
 using UAA.ExtensionsHttp;
 using UAA.Model;
-using UAA.Model.Auth;
+using UAA.Entity;
+using UAA.AuthApi.Helper;
 
 namespace UAA.AuthApi.Services
 {
   public interface IAccountService
   {
-    AuthenticateResponse Authenticate(AuthenticateRequest model, string v);
-    AuthenticateResponse RefreshToken(string refreshToken, string v);
+    Task<(AuthenticateResponse, AppException)> Authenticate(AuthenticateRequest model, string ipAddress);
+    Task<AuthenticateResponse> RefreshToken(string refreshToken, string ipAddress);
   }
 
   public class AccountService : IAccountService
@@ -38,12 +41,16 @@ namespace UAA.AuthApi.Services
     }
 
 
-    public async Task<AuthenticateResponse> Authenticate(AuthenticateRequest model, string ipAddress)
-    {
-      var account = _context.Users.SingleOrDefault(x => x.UserName == model.UserName);
 
-      if (account == null || account.Status.CheckStatus(1) || !BC.Verify(model.Password, account.PasswordHash))
-        return (null, "");
+
+    public async Task<(AuthenticateResponse,AppException)> Authenticate(AuthenticateRequest model, string ipAddress)
+    {
+      var account = await _context.Users.FirstOrDefaultAsync(x => x.UserName == model.UserName);
+
+      if (account == null 
+        || account.Status.CheckStatus(1) 
+        || !HmacHelper.Verify(model.Password, account.PasswordHash, account.PasswordSalt))
+        return (null, new AppException("username or password incurrect"));
 
       // authentication successful so generate jwt and refresh tokens
       var jwtToken = generateJwtToken(account);
@@ -63,7 +70,7 @@ namespace UAA.AuthApi.Services
       return response;
     }
 
-    public AuthenticateResponse RefreshToken(string token, string ipAddress)
+    public Task<AuthenticateResponse> RefreshToken(string token, string ipAddress)
     {
       var (refreshToken, account) = getRefreshToken(token);
 
@@ -88,7 +95,27 @@ namespace UAA.AuthApi.Services
       return response;
     }
 
-    private string generateJwtToken(Account account)
+    private RefreshToken generateRefreshToken(string ipAddress)
+    {
+      return new RefreshToken
+      {
+        Token = randomTokenString(),
+        Expires = DateTime.UtcNow.AddDays(7),
+        Created = DateTime.UtcNow,
+        CreatedByIp = ipAddress
+      };
+    }
+
+    private (RefreshToken, UserAccount) getRefreshToken(string token)
+    {
+      var account = _context.Users.SingleOrDefault(u => u.RefreshTokens.Any(t => t.Token == token));
+      if (account == null) throw new AppException("Invalid token");
+      var refreshToken = account.RefreshTokens.Single(x => x.Token == token);
+      if (!refreshToken.IsActive) throw new AppException("Invalid token");
+      return (refreshToken, account);
+    }
+
+    private string generateJwtToken(UserAccount account)
     {
       var tokenHandler = new JwtSecurityTokenHandler();
       var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
@@ -96,7 +123,8 @@ namespace UAA.AuthApi.Services
       {
         Subject = new ClaimsIdentity(new[] { new Claim("id", account.Id.ToString()) }),
         Expires = DateTime.UtcNow.AddMinutes(15),
-        SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+        SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),
+          SecurityAlgorithms.HmacSha256Signature)
       };
       var token = tokenHandler.CreateToken(tokenDescriptor);
       return tokenHandler.WriteToken(token);

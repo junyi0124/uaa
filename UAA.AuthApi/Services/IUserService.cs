@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UAA.Entity;
-using UAA.Model.User;
+using UAA.Model;
 
 namespace UAA.AuthApi.Services
 {
@@ -20,8 +20,5 @@ namespace UAA.AuthApi.Services
     Task<int> UpdatePassword(ChangePasswordModel user);
     Task<int> Update(UpdateModel user);
     Task<int> Delete(string username);
-
-    // auth
-    Task<UserModel> Authenticate(string username, string password);
   }
 }

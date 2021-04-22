@@ -9,7 +9,7 @@ namespace UAA.AuthApi.Helper
 {
   public static class HmacHelper
   {
-    private static (byte[] hash, byte[] salt, AppException e) CreatePasswordHash(string password)
+    public static (byte[] hash, byte[] salt, AppException e) CreatePasswordHash(string password)
     {
       (byte[] hash, byte[] salt, AppException e) val = (null, null, new AppException("password empty"));
       if (string.IsNullOrEmpty(password)) return val;
@@ -32,7 +32,7 @@ namespace UAA.AuthApi.Helper
       }
     }
 
-    private static byte[] RenewHash(string password, byte[] key)
+    public static byte[] RenewHash(string password, byte[] key)
     {
       if (string.IsNullOrEmpty(password)) throw new AppException("password empty");
 
@@ -42,7 +42,7 @@ namespace UAA.AuthApi.Helper
       }
     }
 
-    private static bool Verify(string password, byte[] Hash, byte[] Salt)
+    public static bool Verify(string password, byte[] Hash, byte[] Salt)
     {
       if (string.IsNullOrEmpty(password)) throw new AppException("password empty");
       //if (string.IsNullOrWhiteSpace(password)) throw new ArgumentException("Value cannot be empty or whitespace only string.", "password");

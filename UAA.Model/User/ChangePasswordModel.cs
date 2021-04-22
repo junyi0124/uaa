@@ -1,7 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace UAA.Model.User
+﻿namespace UAA.Model
 {
+  using System.ComponentModel.DataAnnotations;
+
   /// <summary>
   /// user change password model
   /// </summary>

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace UAA.Model.User
+namespace UAA.Model
 {
   /// <summary>
   /// user update model

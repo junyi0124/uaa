@@ -1,4 +1,4 @@
-﻿namespace UAA.Model.User
+﻿namespace UAA.Model
 {
   /// <summary>
   /// user model

@@ -7,9 +7,9 @@ using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 using UAA.AuthApi.Data;
+using UAA.AuthApi.Helper;
 using UAA.Entity;
 using UAA.Model;
-using UAA.Model.User;
 
 namespace UAA.AuthApi.Services
 {
@@ -25,24 +25,7 @@ namespace UAA.AuthApi.Services
       _mapper = mapper;
     }
 
-    public async Task<UserModel> Authenticate(string username, string password)
-    {
-      if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
-        return null;
 
-      var user = await _context.Users.FirstOrDefaultAsync(x => x.UserName == username);
-
-      // check if username exists
-      if (user == null)
-        return null;
-
-      // check if password is correct
-      if (!VerifyPasswordHash(password, user.PasswordHash, user.PasswordSalt))
-        return null;
-
-      // authentication successful
-      return _mapper.Map<UserModel>(user);
-    }
 
     public Task<List<UserAccount>> GetAll(int page, int pageSize)
     {
@@ -76,10 +59,17 @@ namespace UAA.AuthApi.Services
       var nullIfNameExist = await GetByName(user.UserName, false);
 
       // username not exist
-      if(nullIfNameExist==null)
+      if (nullIfNameExist == null)
       {
         UserAccount newAccount = _mapper.Map<UserAccount>(user);
         // create password hash and salt
+        var hashTuple = HmacHelper.CreatePasswordHash(user.Password);
+        if (hashTuple.e != null)
+        {
+          throw hashTuple.e;
+        }
+        newAccount.PasswordHash = hashTuple.hash;
+        newAccount.PasswordSalt = hashTuple.salt;
 
         _context.Users.Add(newAccount);
         await _context.SaveChangesAsync();
@@ -112,10 +102,10 @@ namespace UAA.AuthApi.Services
         return 0;
 
       // check if password is correct
-      if (!VerifyPasswordHash(user.Password, userInDb.PasswordHash, userInDb.PasswordSalt))
+      if (!HmacHelper.Verify(user.Password, userInDb.PasswordHash, userInDb.PasswordSalt))
         return 0;
 
-      userInDb.PasswordHash = RenewPasswordHash(user.Password, userInDb.PasswordSalt);
+      userInDb.PasswordHash = HmacHelper.RenewHash(user.Password, userInDb.PasswordSalt);
 
       return await _context.SaveChangesAsync();
     }

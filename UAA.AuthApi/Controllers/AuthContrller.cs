@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.IdentityModel.Tokens.Jwt;
 using Microsoft.AspNetCore.Mvc;
 using AutoMapper;
 
 using UAA.AuthApi.Services;
 using UAA.Entity;
 using UAA.Model;
-using UAA.Model.User;
-using System.IdentityModel.Tokens.Jwt;
+using Microsoft.AspNetCore.Http;
 
 namespace UAA.AuthApi.Controllers
 {

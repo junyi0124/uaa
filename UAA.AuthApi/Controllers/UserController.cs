@@ -85,6 +85,7 @@ namespace UAA.AuthApi.Controllers
       }
 
       var user = await _userSrv.Create(model);
+
       return Ok(new AppResponse<object> { Code = 201, Message = "account created" });
     }
 
