@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -40,5 +41,13 @@ namespace UAA.Entity
     public DateTime Created { get; set; }
     public DateTime LastUpdate { get; set; }
 
+    public List<UserToken> RefreshTokens { get; set; }
+
+  }
+
+  public class UserToken
+  {
+    public int Id { get; set; }
+    public string Token { get; set; }
   }
 }

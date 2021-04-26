@@ -22,6 +22,7 @@ namespace UAA.AuthApi.Services
   {
     Task<(AuthenticateResponse, AppException)> Authenticate(AuthenticateRequest model, string ipAddress);
     Task<AuthenticateResponse> RefreshToken(string refreshToken, string ipAddress);
+
   }
 
   public class AccountService : IAccountService

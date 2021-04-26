@@ -9,7 +9,6 @@ using AutoMapper;
 using UAA.AuthApi.Services;
 using UAA.Entity;
 using UAA.Model;
-using UAA.Model.User;
 
 namespace UAA.AuthApi.Controllers
 {
@@ -29,7 +28,7 @@ namespace UAA.AuthApi.Controllers
       _mapper = mapper;
     }
 
-    [HttpGet("{name:regex(^[[A-Za-z0-9-_.]]+$)}")]
+    [HttpGet("{name:regex(^[[A-Za-z0-9-_+=.@!]]+$)}")]
     public async Task<IActionResult> GetUserByName([FromRoute] string name)
     {
       try
